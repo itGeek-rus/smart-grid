@@ -13,6 +13,7 @@ coverage.html
 # Env / secrets
 .env
 .env.local
+.env.example
 *.pem
 
 # IDE / OS
