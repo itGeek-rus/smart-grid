@@ -1,0 +1,27 @@
+# Binaries
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+
+# Go
+vendor/
+coverage.out
+coverage.html
+
+# Env / secrets
+.env
+.env.local
+.env.example
+*.pem
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DB_STORE
+
+# Tooling
+.golangci.cache/
+tmp/
