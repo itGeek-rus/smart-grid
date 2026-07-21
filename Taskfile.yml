@@ -20,12 +20,13 @@ tasks:
   fmt:
     desc: Format code
     cmds:
-      - gofmt -w
+      - gofmt -w .
       - go run golang.org/x/tools/cmd/goimports@latest -w -local github.com/itGeek-rus/smart-grid.git .
 
   lint:
     desc: Run golangci-lint
     cmds:
+      - go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
       - golangci-lint run ./...
 
   test:
@@ -45,10 +46,15 @@ tasks:
     cmds:
       - ./{{.BIN_DIR}}/{{.APP}}
 
+  migrate:
+    desc: Apply DB migrations
+    cmds:
+      - ./scripts/migrate.sh
+
   docker:up:
     desc: Start local infrastructure
     cmds:
-      - docker compose up -d
+      - docker compose up  --env-file .env.example -d
 
   docker:down:
     desc: Stop local infrastructure
@@ -68,7 +74,7 @@ tasks:
   cleancode:
     desc: Start all checks
     cmds:
-      - fmt
-      - lint
-      - test
-      - build
+      - task: fmt
+      - task: lint
+      - task: test
+      - task: build

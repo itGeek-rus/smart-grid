@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/caarlos0/env/v11"
@@ -28,7 +29,25 @@ type HTTPConfig struct {
 }
 
 type PostgresConfig struct {
-	DSN string `env:"POSTGRES_DSN,required"`
+	Host     string `env:"DB_HOST"`
+	Port     int    `env:"DB_PORT"`
+	User     string `env:"DB_USER"`
+	Password string `env:"DB_PASSWORD"`
+	Name     string `env:"DB_NAME"`
+	SSLMode  string `env:"DB_SSLMODE"`
+}
+
+func (p PostgresConfig) DSN() string {
+	u := url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(p.User, p.Password),
+		Host:   fmt.Sprintf("%s:%d", p.Host, p.Port),
+		Path:   p.Name,
+	}
+	q := u.Query()
+	q.Set("sslmode", p.SSLMode)
+	u.RawQuery = q.Encode()
+	return u.String()
 }
 
 type RedisConfig struct {
