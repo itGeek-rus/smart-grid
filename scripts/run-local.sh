@@ -16,5 +16,6 @@ set +a
 
 task docker:up
 task deps
+./scripts/migrate.sh
 task build
 task run
