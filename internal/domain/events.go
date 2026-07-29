@@ -6,7 +6,7 @@ const (
 	EventTypeRawTelemetry       = "telemetry.raw"
 	EventTypeProcessedTelemetry = "telemetry.processed"
 	EventTypeAlertRaised        = "alert.raised"
-	EventDTypeDeviceCommand     = "device.command"
+	EventTypeDeviceCommand      = "device.command"
 )
 
 type Envelope struct {

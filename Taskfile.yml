@@ -40,11 +40,23 @@ tasks:
       - mkdir -p {{.BIN_DIR}}
       - go build {{.GOFLAGS}} -o {{.BIN_DIR}}/{{.APP}} ./cmd/processor
 
+  build:ingestion:
+    desc: Build ingestion binary
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - go build {{.GOFLAGS}} -o {{.BIN_DIR}}/ingestion ./cmd/ingestion
+
   run:
     desc: Run processor locally
     deps: [build]
     cmds:
       - ./{{.BIN_DIR}}/{{.APP}}
+
+  run:ingestion:
+    desc: Run ingestion locally
+    deps: [build:ingestion]
+    cmds:
+      - APP_NAME=smart-grid-ingestion HTTP_ADDR=:8081 ./{{.BIN_DIR}}/ingestion
 
   migrate:
     desc: Apply DB migrations
@@ -54,7 +66,7 @@ tasks:
   docker:up:
     desc: Start local infrastructure
     cmds:
-      - docker compose up  --env-file .env.example -d
+      - docker compose up  --env-file .env up -d
 
   docker:down:
     desc: Stop local infrastructure

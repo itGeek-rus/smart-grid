@@ -62,12 +62,13 @@ type KafkaConfig struct {
 	TopicRawTelemetry    string   `env:"KAFKA_TOPIC_RAW_TELEMETRY" envDefault:"raw.telemetry"`
 	TopicProcessedEvents string   `env:"KAFKA_TOPIC_PROCESSED_EVENTS" envDefault:"processed.events"`
 	TopicAlerts          string   `env:"KAFKA_TOPIC_ALERTS" envDefault:"alerts"`
+	TopicCommands        string   `env:"KAFKA_TOPIC_COMMANDS" envDefault:"commands"`
 	TopicDLQ             string   `env:"KAFKA_TOPIC_DLQ" envDefault:"raw.telemetry.dlq"`
 	ConsumeGroup         string   `env:"KAFKA_CONSUMER_GROUP" envDefault:"processor"`
 }
 
 type MQTTConfig struct {
-	BrokerURL      string `env:"MQTT_BROKER_URL" envDefault:"localhost:1883"`
+	BrokerURL      string `env:"MQTT_BROKER_URL" envDefault:"tcp://localhost:1883"`
 	ClientID       string `env:"MQTT_CLIENT_ID" envDefault:"smart-grid-ingestion"`
 	TopicTelemetry string `env:"MQTT_TOPIC_TELEMETRY" envDefault:"smartmeter/+/+"`
 	Qos            byte   `env:"MQTT_QOS" envDefault:"1"`
