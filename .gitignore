@@ -15,6 +15,7 @@ coverage.html
 .env.local
 .env.example
 *.pem
+.env.ingestion
 
 # IDE / OS
 .idea/
@@ -24,4 +25,4 @@ coverage.html
 
 # Tooling
 .golangci.cache/
-tmp/
+tmp/.env.ingestion
