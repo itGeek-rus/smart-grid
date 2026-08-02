@@ -135,6 +135,13 @@ docker exec smartgrid-mosquitto mosquitto_pub -h localhost \
 task cleancode   # fmt + lint + test + build
 ```
 
+### 8 Git hooks
+
+```bash
+brew install lefthook
+lefthook install
+```
+
 ## Команды Task
 
 | Команда | Назначение |

@@ -10,7 +10,7 @@ import (
 )
 
 func TestHealthz(t *testing.T) {
-	router := rest.NewRouter("smart-grid-processor", "local")
+	router := rest.NewRouter("smart-grid-processor", "local", nil)
 	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/healthz", nil)
 	rec := httptest.NewRecorder()
 	router.Handler().ServeHTTP(rec, req)

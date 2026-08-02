@@ -1,0 +1,10 @@
+pre-commit:
+  commands:
+    fmt:
+      run: task fmt
+    lint:
+      run: task lint
+    test:
+      run: task test
+    build:
+      run: task build
