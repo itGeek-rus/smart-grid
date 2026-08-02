@@ -13,7 +13,7 @@ type Router struct {
 	appEnv  string
 }
 
-func NewRouter(appName string, appEnv string) *Router {
+func NewRouter(appName, appEnv string, api *APIHandler) *Router {
 	r := &Router{
 		mux:     http.NewServeMux(),
 		started: time.Now().UTC(),
@@ -21,6 +21,9 @@ func NewRouter(appName string, appEnv string) *Router {
 		appEnv:  appEnv,
 	}
 	r.registerRoutes()
+	if api != nil {
+		api.Register(r.mux)
+	}
 	return r
 }
 

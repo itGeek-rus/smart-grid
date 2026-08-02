@@ -47,7 +47,7 @@ func NewIngestion() (*IngestionApp, error) {
 		return nil, err
 	}
 
-	router := rest.NewRouter(cfg.App.Name, cfg.App.Env)
+	router := rest.NewRouter(cfg.App.Name, cfg.App.Env, nil)
 	server := &http.Server{
 		Addr:              cfg.HTTP.Addr,
 		Handler:           router.Handler(),

@@ -10,5 +10,6 @@ type DeviceRepository interface {
 	GetByID(ctx context.Context, id string) (*domain.Device, error)
 	GetByExternalID(ctx context.Context, externalID string) (*domain.Device, error)
 	ListByZone(ctx context.Context, zone string) ([]domain.Device, error)
+	ListAll(ctx context.Context) ([]domain.Device, error)
 	Upsert(ctx context.Context, device domain.Device) error
 }
