@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: smartgrid-api
+    static_configs:
+      - targets: ["host.docker.internal:8082"]
+  - job_name: smartgrid-processor
+    static_configs:
+      - targets: ["host.docker.internal:8080"]
+  - job_name: smartgrid-ingestion
+    static_configs:
+      - targets: ["host.docker.internal:8081"]

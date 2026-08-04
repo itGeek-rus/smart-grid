@@ -8,6 +8,8 @@ import (
 
 	"github.com/segmentio/kafka-go"
 
+	"github.com/itGeek-rus/smart-grid.git/internal/pkg/metrics"
+
 	"github.com/itGeek-rus/smart-grid.git/internal/config"
 	"github.com/itGeek-rus/smart-grid.git/internal/domain"
 )
@@ -76,8 +78,10 @@ func (p *Producer) publish(ctx context.Context, w *kafka.Writer, key string, v a
 		Time:  time.Now().UTC(),
 	})
 	if err != nil {
+		metrics.KafkaPublished.WithLabelValues("raw.telemetry", "error").Inc()
 		return fmt.Errorf("kafka write topic=%s: %w", w.Topic, err)
 	}
+	metrics.KafkaPublished.WithLabelValues("raw.telemetry", "ok").Inc()
 	return nil
 }
 

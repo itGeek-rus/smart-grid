@@ -9,6 +9,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/itGeek-rus/smart-grid.git/internal/pkg/metrics"
+
 	"github.com/itGeek-rus/smart-grid.git/internal/domain"
 	"github.com/itGeek-rus/smart-grid.git/internal/repository"
 )
@@ -47,6 +49,8 @@ func (s *Service) HandleRawMessage(ctx context.Context, key, value []byte) error
 	if event.DeviceID == "" || event.MeasuredAt.IsZero() {
 		return s.toDLQ(ctx, key, value, "missing device_id or measured_at")
 	}
+
+	metrics.KafkaConsumed.WithLabelValues("raw.telemetry", "ok").Inc()
 
 	t := domain.Telemetry{
 		ID:         event.EventID,
@@ -112,6 +116,7 @@ func (s *Service) HandleRawMessage(ctx context.Context, key, value []byte) error
 		}
 		if det.AnomalyScore >= 0.9 {
 			alert.Severity = domain.AlertSeverityCritical
+			metrics.Anomalies.WithLabelValues(det.AlertType, string(alert.Severity)).Inc()
 		}
 		if err := s.alerts.Create(ctx, alert); err != nil {
 			return err
@@ -139,6 +144,8 @@ func (s *Service) HandleRawMessage(ctx context.Context, key, value []byte) error
 		slog.String("device_id", t.DeviceID),
 		slog.Float64("anomaly_score", det.AnomalyScore),
 	)
+
+	metrics.TelemetryProcessed.Inc()
 
 	return nil
 }

@@ -2,6 +2,7 @@ package rest_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,5 +17,31 @@ func TestHealthz(t *testing.T) {
 	router.Handler().ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+}
+
+func TestReadyz_OK(t *testing.T) {
+	router := rest.NewRouter("smart-grid-api", "local", nil,
+		rest.ReadyFunc(func(context.Context) error { return nil }),
+	)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/readyz", nil)
+	rec := httptest.NewRecorder()
+	router.Handler().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+}
+
+func TestReadyz_NotReady(t *testing.T) {
+	router := rest.NewRouter("smart-grid-api", "local", nil,
+		rest.ReadyFunc(func(context.Context) error {
+			return errors.New("db down")
+		}),
+	)
+	req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/readyz", nil)
+	rec := httptest.NewRecorder()
+	router.Handler().ServeHTTP(rec, req)
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503", rec.Code)
 	}
 }
