@@ -8,6 +8,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/itGeek-rus/smart-grid.git/internal/pkg/metrics"
+
 	"github.com/itGeek-rus/smart-grid.git/internal/domain"
 	"github.com/itGeek-rus/smart-grid.git/internal/repository"
 )
@@ -41,6 +43,8 @@ func (s *Service) HandleMQTT(ctx context.Context, msg repository.MQTTMessage) er
 		return err
 	}
 
+	metrics.MQTTMessages.WithLabelValues("ok").Inc()
+
 	s.log.Info("telemetry ingested",
 		slog.String("device_id", event.DeviceID),
 		slog.String("zone", event.Zone),
@@ -61,6 +65,9 @@ func (s *Service) toDLQ(ctx context.Context, msg repository.MQTTMessage, reason 
 		Reason:      reason,
 		RawPayload:  string(msg.Payload),
 	}
+
+	metrics.KafkaPublished.WithLabelValues("raw.telemetry", "ok").Inc()
+
 	if err := s.publisher.PublishDLQ(ctx, dlq); err != nil {
 		return err
 	}

@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/itGeek-rus/smart-grid.git/internal/config"
 	"github.com/itGeek-rus/smart-grid.git/internal/pkg/logger"
 	kafkarepo "github.com/itGeek-rus/smart-grid.git/internal/repository/kafka"
@@ -24,7 +26,7 @@ type API struct {
 	cfg      config.Config
 	log      *slog.Logger
 	server   *http.Server
-	pool     interface{ Close() }
+	pool     *pgxpool.Pool
 	cache    *redisrepo.Cache
 	producer *kafkarepo.Producer
 }
@@ -65,9 +67,22 @@ func NewAPI() (*API, error) {
 	)
 	apiHandler := rest.NewAPIHandler(uc)
 
+	pgReady := rest.ReadyFunc(func(ctx context.Context) error {
+		return pool.Ping(ctx)
+	})
+	redisReady := rest.ReadyFunc(func(ctx context.Context) error {
+		return cache.Ping(ctx)
+	})
+
 	server := &http.Server{
-		Addr:              cfg.HTTP.Addr,
-		Handler:           rest.NewRouter(cfg.App.Name, cfg.App.Env, apiHandler).Handler(),
+		Addr: cfg.HTTP.Addr,
+		Handler: rest.NewRouter(
+			cfg.App.Name,
+			cfg.App.Env,
+			apiHandler,
+			pgReady,
+			redisReady,
+		).Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 

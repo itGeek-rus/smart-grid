@@ -46,6 +46,12 @@ tasks:
       - mkdir -p {{.BIN_DIR}}
       - go build {{.GOFLAGS}} -o {{.BIN_DIR}}/ingestion ./cmd/ingestion
 
+  build:api:
+    desc: Build api binary
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - go build {{.GOFLAGS}} -o {{.BIN_DIR}}/api ./cmd/api
+
   run:processor:
     desc: Run processor locally
     deps: [build]
@@ -60,9 +66,10 @@ tasks:
 
   run:api:
     desc: Run api locally
-    dotenv: ['.env']
+    deps: [build:api]
+    dotenv: ['.env.api']
     cmds:
-      - ./bin/api
+      - ./{{.BIN_DIR}}/api
 
   migrate:
     desc: Apply DB migrations
@@ -72,7 +79,7 @@ tasks:
   docker:up:
     desc: Start local infrastructure
     cmds:
-      - docker compose up  --env-file .env up -d
+      - docker compose up  --env-file .env.processor up -d
 
   docker:down:
     desc: Stop local infrastructure
