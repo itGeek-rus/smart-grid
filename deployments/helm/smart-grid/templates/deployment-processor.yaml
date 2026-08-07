@@ -1,0 +1,73 @@
+{{- if .Values.processor.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "smart-grid.name" . }}-processor
+  labels:
+    {{- include "smart-grid.labels" . | nindent 4 }}
+    app.kubernetes.io/component: processor
+spec:
+  replicas: {{ .Values.processor.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: processor
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: processor
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.processor.service.port }}"
+        prometheus.io/path: /metrics
+    spec:
+      containers:
+        - name: processor
+          image: "{{ .Values.processor.image.repository }}:{{ .Values.processor.image.tag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.processor.service.port }}
+              name: http
+          env:
+            - name: APP_NAME
+              value: {{ .Values.processor.env.APP_NAME | quote }}
+            - name: HTTP_ADDR
+              value: {{ .Values.processor.env.HTTP_ADDR | quote }}
+            - name: DB_HOST
+              value: {{ .Values.dependencies.postgres.host | quote }}
+            - name: DB_PORT
+              value: {{ .Values.dependencies.postgres.port | quote }}
+            - name: DB_NAME
+              value: {{ .Values.dependencies.postgres.db | quote }}
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "smart-grid.name" . }}-db
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "smart-grid.name" . }}-db
+                  key: password
+            - name: DB_SSLMODE
+              value: "disable"
+            - name: REDIS_ADDR
+              value: {{ .Values.dependencies.redis.addr | quote }}
+            - name: KAFKA_BROKERS
+              value: {{ .Values.dependencies.kafka.brokers | quote }}
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.processor.resources | nindent 12 }}
+{{- end }}

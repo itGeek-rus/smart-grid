@@ -1,0 +1,17 @@
+{{- if .Values.ingestion.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "smart-grid.name" . }}-ingestion
+  labels:
+    {{- include "smart-grid.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ingestion
+spec:
+  selector:
+    app.kubernetes.io/component: ingestion
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: {{ .Values.ingestion.service.port }}
+      targetPort: http
+{{- end }}

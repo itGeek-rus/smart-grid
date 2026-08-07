@@ -1,0 +1,76 @@
+global:
+  imagePullPolicy: IfNotPresent
+
+processor:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: smart-grid/processor
+    tag: local
+  service:
+    port: 8080
+  env:
+    APP_NAME: smart-grid-processor
+    HTTP_ADDR: ":8080"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+ingestion:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: smart-grid/ingestion
+    tag: local
+  service:
+    port: 8081
+  env:
+    APP_NAME: smart-grid-ingestion
+    HTTP_ADDR: ":8081"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+api:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: smart-grid/api
+    tag: local
+  service:
+    port: 8082
+  env:
+    APP_NAME: smart-grid-api
+    HTTP_ADDR: ":8082"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+dependencies:
+  postgres:
+    host: timescaledb
+    port: 5432
+    db: smart-grid
+    user: postgres
+    password: postgres
+  redis:
+    addr: redis:6379
+  kafka:
+    brokers: "kafka:9092"
+  mqtt:
+    brokerURL: "tcp://mosquitto:1883"
+
+serviceMonitor:
+  enabled: false

@@ -1,0 +1,14 @@
+# Local / kind overrides
+global:
+  imagePullPolicy: IfNotPresent
+
+dependencies:
+  postgres:
+    host: timescaledb
+    password: postgres
+  kafka:
+    brokers: "kafka:9092"
+  redis:
+    addr: redis:6379
+  mqtt:
+    brokerURL: "tcp://mosquitto:1883"
