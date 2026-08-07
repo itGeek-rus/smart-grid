@@ -79,7 +79,7 @@ tasks:
   docker:up:
     desc: Start local infrastructure
     cmds:
-      - docker compose up  --env-file .env.processor up -d
+      - docker compose --env-file .env.processor up -d
 
   docker:down:
     desc: Stop local infrastructure
@@ -96,6 +96,23 @@ tasks:
     cmds:
       - curl -sf http://localhost:8080/healthz
 
+  docker:build:
+    desc: Build service images
+    cmds:
+      - docker build -f build/Dockerfile.processor -t smart-grid/processor:local .
+      - docker build -f build/Dockerfile.ingestion -t smart-grid/ingestion:local .
+      - docker build -f build/Dockerfile.api -t smart-grid/api:local .
+
+  helm:lint:
+    desc: Lint Helm chart
+    cmds:
+      - helm lint deployments/helm/smart-grid
+
+  helm:template:
+    desc: Render Helm manifests
+    cmds:
+      - helm template smart-grid deployments/helm/smart-grid -f deployments/helm/smart-grid/values-dev.yaml
+
   cleancode:
     desc: Start all checks
     cmds:
@@ -103,3 +120,5 @@ tasks:
       - task: lint
       - task: test
       - task: build
+      - task: build:ingestion
+      - task: build:api
